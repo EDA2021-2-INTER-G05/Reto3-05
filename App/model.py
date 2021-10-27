@@ -59,13 +59,17 @@ def añadirAvistamiento(avistamiento,catalog):
 def add_or_create_in_om(mapa,llave_mapa,llave_arbol,valor):
     if mp.contains(mapa,llave_mapa):
         arbol = mp.get(mapa,llave_mapa)["value"]
-        lista = om.get(arbol,llave_arbol)["value"]
+        lista = om.get(arbol,llave_arbol)
+        if lista == None:
+            om.put(arbol,llave_arbol,lt.newList("ARRAY_LIST"))
+            lista = om.get(arbol,llave_arbol)
+        lista = lista["value"]
         lt.addLast(lista,valor)
 
     else:
         mp.put(mapa,llave_mapa,om.newMap())
         arbol = mp.get(mapa,llave_mapa)["value"]
-        om.put(arbol,llave_arbol,lt.newList())
+        om.put(arbol,llave_arbol,lt.newList("ARRAY_LIST"))
         lista = om.get(arbol,llave_arbol)["value"]
         lt.addLast(lista,valor)
 
@@ -74,7 +78,7 @@ def add_or_create_in_om(mapa,llave_mapa,llave_arbol,valor):
 def nuevoAvistamiento(entrada):
     avistamiento = mp.newMap(loadfactor=4)
     mp.put(avistamiento,"Ciudad",entrada["city"])
-    mp.put(avistamiento,"Dia",entrada["datetime"])
+    mp.put(avistamiento,"Dia",datetime.strptime(entrada["datetime"],"%Y-%m-%d %X"))
     mp.put(avistamiento,"Duracion",entrada["duration (seconds)"])
     mp.put(avistamiento,"Forma",entrada["shape"])
     return avistamiento

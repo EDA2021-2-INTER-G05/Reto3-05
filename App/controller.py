@@ -23,6 +23,7 @@
 import config as cf
 import model
 import csv
+from DISClib.ADT import list as lt
 
 
 """
@@ -37,13 +38,18 @@ def initCatalog():
 # Funciones para la carga de datos
 
 def loadData(catalog):
-    Cargaravisamientos(catalog)
+    numero = Cargaravisamientos(catalog)
+    return numero
 
 def Cargaravisamientos(catalog):
     file = cf.data_dir + "UFOS-utf8-large.csv"
     input_file = csv.DictReader(open(file, encoding='utf-8'))
+    numero = 0
     for avistamiento in input_file:
         model.subirAvistamiento(catalog,avistamiento)
+        numero += 1
+    
+    return numero
  
 
 # Funciones de ordenamiento

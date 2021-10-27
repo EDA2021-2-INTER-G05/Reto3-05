@@ -46,7 +46,7 @@ def printMenu():
     print("0- Cargar información en el catálogo")
     print("1- Contar avistamientos en una ciudad")
     print("2- Contar avistamientos por duración")
-    print("3- Contar avistamientos por Hora/Minutos del día")
+    print("3- Contar avistamientos por Hora/Minutos del día (info arbol para lab 8)")
     print("4- Contar los avistamientos en un rango de fechas")
     print("5- Contar los avistamientos de una zona geográfica")
     print("6- Visualizar los avistamientos de una zona geográfica")
@@ -64,16 +64,19 @@ while True:
         print("Cargando información de los archivos ....")
         start_time = time.process_time()
         catalog = initCatalog()
-        loadData(catalog)
+        numero = loadData(catalog)
         stop_time = time.process_time()
         elapsed_time_mseg = (stop_time - start_time)*1000
         print("Se han cargado los datos exitosamente.")
+        print("Se cargaron "+ str(numero)+ " avistamientos")
         print("Tiempo requerido: "+ str(elapsed_time_mseg) + " mseg")
-
-        
 
     elif int(inputs[0]) == 2:
         pass
+    
+    elif int(inputs[0]) == 3:
+        print("Para este requerimiento se creo una tabla de hash como llave cada ciudad y valor un arbol ordenado con llaves el datetime y valores los avistamientos. Por lo tanto no se puede mostrar una única altura, ya que hay un árbol por ciudad.")
+        print("De esta manera se combina la búsqueda O(1) de las tablas de hash, y la eficiencia de la organización de los árboles.")
 
     else:
         sys.exit(0)
