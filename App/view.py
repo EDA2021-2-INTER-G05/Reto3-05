@@ -25,6 +25,7 @@ import sys
 import controller
 from DISClib.ADT import list as lt
 assert cf
+import time
 
 
 """
@@ -33,11 +34,23 @@ Presenta el menu de opciones y por cada seleccion
 se hace la solicitud al controlador para ejecutar la
 operación solicitada
 """
+def initCatalog():
+    return controller.initCatalog()
+
+def loadData(catalog):
+    return controller.loadData(catalog)
+
 
 def printMenu():
     print("Bienvenido")
-    print("1- Cargar información en el catálogo")
-    print("2- ")
+    print("0- Cargar información en el catálogo")
+    print("1- Contar avistamientos en una ciudad")
+    print("2- Contar avistamientos por duración")
+    print("3- Contar avistamientos por Hora/Minutos del día")
+    print("4- Contar los avistamientos en un rango de fechas")
+    print("5- Contar los avistamientos de una zona geográfica")
+    print("6- Visualizar los avistamientos de una zona geográfica")
+
 
 catalog = None
 
@@ -47,8 +60,17 @@ Menu principal
 while True:
     printMenu()
     inputs = input('Seleccione una opción para continuar\n')
-    if int(inputs[0]) == 1:
+    if int(inputs[0]) == 0:
         print("Cargando información de los archivos ....")
+        start_time = time.process_time()
+        catalog = initCatalog()
+        loadData(catalog)
+        stop_time = time.process_time()
+        elapsed_time_mseg = (stop_time - start_time)*1000
+        print("Se han cargado los datos exitosamente.")
+        print("Tiempo requerido: "+ str(elapsed_time_mseg) + " mseg")
+
+        
 
     elif int(inputs[0]) == 2:
         pass
