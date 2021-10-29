@@ -55,3 +55,6 @@ def Cargaravisamientos(catalog):
 # Funciones de ordenamiento
 
 # Funciones de consulta sobre el catálogo
+
+def avistamientos_ciudad(catalog,ciudad):
+    return model.avistamientos_ciudad(catalog,ciudad)

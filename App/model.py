@@ -33,6 +33,7 @@ from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import shellsort as sa
 assert cf
 from datetime import datetime 
+from DISClib.Algorithms.Trees import traversal as tra
 
 """
 Se define la estructura de un catálogo de videos. El catálogo tendrá dos listas, una para los videos, otra para las categorias de
@@ -85,6 +86,33 @@ def nuevoAvistamiento(entrada):
 
 
 # Funciones de consulta
+
+def avistamientos_ciudad(catalog,ciudad):
+    datos = mp.get(catalog,"Ciudades")["value"]
+    numero_ciudades = lt.size(mp.keySet(datos))
+    arbol = mp.get(datos,ciudad)["value"]
+
+    avistamientos = tra.inorder(arbol)
+    lista = lt.newList("ARRAY_LIST")
+
+    if lt.size(avistamientos) > 6:
+        for i in range(1,4):
+            elemento = lt.getElement(avistamientos,i)
+            lt.addLast(lista,elemento)
+        
+        for i in range(lt.size(avistamientos)-2,lt.size(avistamientos)+1):
+            elemento = lt.getElement(avistamientos,i)
+            lt.addLast(lista,elemento)
+    
+    else:
+        lista = avistamientos
+
+    return lista, numero_ciudades
+
+
+
+
+    pass
 
 # Funciones utilizadas para comparar elementos dentro de una lista
 

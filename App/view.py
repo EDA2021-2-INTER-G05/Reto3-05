@@ -26,6 +26,7 @@ import controller
 from DISClib.ADT import list as lt
 assert cf
 import time
+from prettytable import prettytable
 
 
 """
@@ -39,6 +40,9 @@ def initCatalog():
 
 def loadData(catalog):
     return controller.loadData(catalog)
+
+def print_avistamientos_ciudad(lista,numero,tiempo):
+    pass
 
 
 def printMenu():
@@ -71,8 +75,13 @@ while True:
         print("Se cargaron "+ str(numero)+ " avistamientos")
         print("Tiempo requerido: "+ str(elapsed_time_mseg) + " mseg")
 
-    elif int(inputs[0]) == 2:
-        pass
+    elif int(inputs[0]) == 1:
+        ciudad = input("Ingrese la ciudad que se quiere consultar: ").strip()
+        start_time = time.process_time()
+        resultado = controller.avistamientos_ciudad(catalog,ciudad)
+        stop_time = time.process_time()
+        elapsed_time_mseg = (stop_time - start_time)*1000
+        print_avistamientos_ciudad(resultado[0],resultado[1],elapsed_time_mseg)
     
     elif int(inputs[0]) == 3:
         print("Para este requerimiento se creo una tabla de hash como llave cada ciudad y valor un arbol ordenado con llaves el datetime y valores los avistamientos. Por lo tanto no se puede mostrar una única altura, ya que hay un árbol por ciudad.")
