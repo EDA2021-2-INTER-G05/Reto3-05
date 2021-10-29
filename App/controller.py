@@ -24,6 +24,7 @@ import config as cf
 import model
 import csv
 from DISClib.ADT import list as lt
+from DISClib.ADT import queue as que
 
 
 """
@@ -45,11 +46,13 @@ def Cargaravisamientos(catalog):
     file = cf.data_dir + "UFOS-utf8-large.csv"
     input_file = csv.DictReader(open(file, encoding='utf-8'))
     numero = 0
+    primeros_5 = lt.newList()
+    ultimos_5 = que.newQueue()
     for avistamiento in input_file:
-        model.subirAvistamiento(catalog,avistamiento)
         numero += 1
+        model.subirAvistamiento(catalog,avistamiento,numero,primeros_5,ultimos_5)
     
-    return numero
+    return numero, primeros_5,ultimos_5
  
 
 # Funciones de ordenamiento

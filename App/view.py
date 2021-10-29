@@ -26,7 +26,8 @@ import controller
 from DISClib.ADT import list as lt
 assert cf
 import time
-from prettytable import prettytable
+from prettytable import PrettyTable
+from DISClib.ADT import map as mp
 
 
 """
@@ -42,8 +43,33 @@ def loadData(catalog):
     return controller.loadData(catalog)
 
 def print_avistamientos_ciudad(lista,numero,tiempo):
-    pass
+    tabla = PrettyTable()
+    tabla.field_names = ["Fecha y hora", "Ciudad", "Pais","Duración","Forma"]
+    for avistamiento in lt.iterator(lista):
+        tabla.add_row([mp.get(avistamiento,"Dia")["value"],mp.get(avistamiento,"Ciudad")["value"],mp.get(avistamiento,"Pais")["value"],mp.get(avistamiento,"Duracion")["value"],mp.get(avistamiento,"Forma")["value"]])
+    
+    print("Hubo avistamintos en " + str(numero) + " ciudades diferentes.")
+    print("Para esta ciudad, los 3 primeros y 3 últimos avistamientos fueron: ")
+    print(tabla)
+    print("Tiempo requerido " + str(tiempo)+ " mseg")
 
+def print_datos(numero,primeros,ultimos):
+    print("Se cargaron "+str(numero)+" avistamientos")
+
+    print("Los primeros 5 datos cargados fueron: ")
+    tabla = PrettyTable()
+    tabla.field_names = ["Fecha y hora", "Ciudad", "Pais","Duración","Forma"]
+    for avistamiento in lt.iterator(primeros):
+        tabla.add_row([mp.get(avistamiento,"Dia")["value"],mp.get(avistamiento,"Ciudad")["value"],mp.get(avistamiento,"Pais")["value"],mp.get(avistamiento,"Duracion")["value"],mp.get(avistamiento,"Forma")["value"]])
+    print(tabla)
+
+    print("Los últimos 5 fueron: ")
+    tabla = PrettyTable()
+    tabla.field_names = ["Fecha y hora", "Ciudad", "Pais","Duración","Forma"]
+    for avistamiento in lt.iterator(ultimos):
+        tabla.add_row([mp.get(avistamiento,"Dia")["value"],mp.get(avistamiento,"Ciudad")["value"],mp.get(avistamiento,"Pais")["value"],mp.get(avistamiento,"Duracion")["value"],mp.get(avistamiento,"Forma")["value"]])
+    print(tabla)
+    
 
 def printMenu():
     print("Bienvenido")
@@ -68,11 +94,11 @@ while True:
         print("Cargando información de los archivos ....")
         start_time = time.process_time()
         catalog = initCatalog()
-        numero = loadData(catalog)
+        datos = loadData(catalog)
         stop_time = time.process_time()
         elapsed_time_mseg = (stop_time - start_time)*1000
         print("Se han cargado los datos exitosamente.")
-        print("Se cargaron "+ str(numero)+ " avistamientos")
+        print_datos(datos[0],datos[1],datos[2])
         print("Tiempo requerido: "+ str(elapsed_time_mseg) + " mseg")
 
     elif int(inputs[0]) == 1:

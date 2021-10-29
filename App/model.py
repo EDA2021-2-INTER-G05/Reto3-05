@@ -34,6 +34,7 @@ from DISClib.Algorithms.Sorting import shellsort as sa
 assert cf
 from datetime import datetime 
 from DISClib.Algorithms.Trees import traversal as tra
+from DISClib.ADT import queue as que
 
 """
 Se define la estructura de un catálogo de videos. El catálogo tendrá dos listas, una para los videos, otra para las categorias de
@@ -50,9 +51,17 @@ def initCatalog():
 
 # Funciones para agregar informacion al catalogo
 
-def subirAvistamiento(catalog,entrada):
+def subirAvistamiento(catalog,entrada,numero,primeros_5,ultimos_5):
     avistamiento = nuevoAvistamiento(entrada)
     añadirAvistamiento(avistamiento,catalog)
+    if numero <6:
+        lt.addLast(primeros_5,avistamiento)
+    else:
+        if que.size(ultimos_5) < 5:
+            que.enqueue(ultimos_5,avistamiento)
+        else:
+            que.dequeue(ultimos_5)
+            que.enqueue(ultimos_5,avistamiento)
 
 def añadirAvistamiento(avistamiento,catalog):
     add_or_create_in_om(mp.get(catalog,"Ciudades")["value"],mp.get(avistamiento,"Ciudad")["value"],mp.get(avistamiento,"Dia")["value"],avistamiento)
@@ -81,7 +90,11 @@ def nuevoAvistamiento(entrada):
     mp.put(avistamiento,"Ciudad",entrada["city"])
     mp.put(avistamiento,"Dia",datetime.strptime(entrada["datetime"],"%Y-%m-%d %X"))
     mp.put(avistamiento,"Duracion",entrada["duration (seconds)"])
-    mp.put(avistamiento,"Forma",entrada["shape"])
+    if entrada["shape"] == "":
+        mp.put(avistamiento,"Forma","*No especificado*")
+    else:
+        mp.put(avistamiento,"Forma",entrada["shape"])
+    mp.put(avistamiento,"Pais",entrada["country"])
     return avistamiento
 
 
@@ -92,7 +105,12 @@ def avistamientos_ciudad(catalog,ciudad):
     numero_ciudades = lt.size(mp.keySet(datos))
     arbol = mp.get(datos,ciudad)["value"]
 
-    avistamientos = tra.inorder(arbol)
+    fechas = tra.inorder(arbol)
+    avistamientos = lt.newList("ARRAY_LIST")
+    for fecha in lt.iterator(fechas):
+        for avistamiento in lt.iterator(fecha):
+            lt.addLast(avistamientos,avistamiento)
+
     lista = lt.newList("ARRAY_LIST")
 
     if lt.size(avistamientos) > 6:
