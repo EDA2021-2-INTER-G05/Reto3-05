@@ -61,3 +61,6 @@ def Cargaravisamientos(catalog):
 
 def avistamientos_ciudad(catalog,ciudad):
     return model.avistamientos_ciudad(catalog,ciudad)
+
+def avistamientos_hora(catalog,hora_menor,hora_mayor):
+    return model.avistamientos_hora(catalog,hora_menor,hora_mayor)

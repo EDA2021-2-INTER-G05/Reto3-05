@@ -30,7 +30,7 @@ from DISClib.ADT import list as lt
 from DISClib.ADT import map as mp
 from DISClib.ADT import orderedmap as om
 from DISClib.DataStructures import mapentry as me
-from DISClib.Algorithms.Sorting import shellsort as sa
+from DISClib.Algorithms.Sorting import shellsort 
 assert cf
 from datetime import datetime 
 from DISClib.Algorithms.Trees import traversal as tra
@@ -46,6 +46,7 @@ los mismos.
 def initCatalog():
     catalog = mp.newMap(loadfactor=4)
     mp.put(catalog,"Ciudades",mp.newMap(loadfactor=4))
+    mp.put(catalog,"Horas",om.newMap())
     return catalog
 
 
@@ -64,7 +65,14 @@ def subirAvistamiento(catalog,entrada,numero,primeros_5,ultimos_5):
             que.enqueue(ultimos_5,avistamiento)
 
 def añadirAvistamiento(avistamiento,catalog):
+    
+    #Carga req 1
     add_or_create_in_om(mp.get(catalog,"Ciudades")["value"],mp.get(avistamiento,"Ciudad")["value"],mp.get(avistamiento,"Dia")["value"],avistamiento)
+
+    #Carga req 3
+    fecha = mp.get(avistamiento,"Dia")["value"]
+    llave = (fecha.hour,fecha.minute)
+    add_list_in_om(mp.get(catalog,"Horas")["value"],llave,avistamiento)
 
 def add_or_create_in_om(mapa,llave_mapa,llave_arbol,valor):
     if mp.contains(mapa,llave_mapa):
@@ -83,6 +91,14 @@ def add_or_create_in_om(mapa,llave_mapa,llave_arbol,valor):
         lista = om.get(arbol,llave_arbol)["value"]
         lt.addLast(lista,valor)
 
+def add_list_in_om(arbol,llave_arbol,valor):
+    if om.contains(arbol,llave_arbol):
+        lista = om.get(arbol,llave_arbol)["value"]
+        lt.addLast(lista,valor)
+    else:
+        om.put(arbol,llave_arbol,lt.newList())
+        lista = om.get(arbol,llave_arbol)["value"]
+        lt.addLast(lista,valor)
 # Funciones para creacion de datos
 
 def nuevoAvistamiento(entrada):
@@ -127,11 +143,42 @@ def avistamientos_ciudad(catalog,ciudad):
 
     return lista, numero_ciudades
 
+def avistamientos_hora(catalog,hora_menor,hora_mayor):
+    arbol = mp.get(catalog,"Horas")["value"]
+    llave_max_glo = om.size(arbol)
+    llave_min_glo = om.select(arbol,llave_max_glo-5)
+    horas_mas_tardias = om.values(arbol,llave_min_glo,om.maxKey(arbol))
+    mas_tardios = lt.newList("ARRAY_LIST")
+    for hora in lt.iterator(horas_mas_tardias):
+        shellsort.sort(hora,sort_time)
+        for avistamiento in lt.iterator(hora):
+            lt.addLast(mas_tardios,avistamiento)
+    
+    mas_tardios = lt.subList(mas_tardios,lt.size(mas_tardios)-5,5)
 
+    hora_menor = om.ceiling(arbol,hora_menor)
+    hora_mayor = om.floor(arbol,hora_mayor)
+    rango_horas = om.values(arbol,hora_menor,hora_mayor)
+    avistamientos = lt.newList("ARRAY_LIST")
 
+    contador = 0
+    for hora in lt.iterator(rango_horas):
+        contador += 1
+        if contador < 4 or contador in range(lt.size(rango_horas)-2,lt.size(rango_horas)+1):
+            shellsort.sort(hora,sort_time)
 
-    pass
+        for avistamiento in lt.iterator(hora):
+            lt.addLast(avistamientos,avistamiento)
+    
+    return avistamientos,mas_tardios
+
 
 # Funciones utilizadas para comparar elementos dentro de una lista
+
+def sort_time(av1,av2):
+    if mp.get(av1,"Dia")["value"] <mp.get(av2,"Dia")["value"]:
+        return True
+    else:
+        return False
 
 # Funciones de ordenamiento
