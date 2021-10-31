@@ -139,8 +139,8 @@ def nuevoAvistamiento(entrada):
     else:
         mp.put(avistamiento,"Forma",entrada["shape"])
     mp.put(avistamiento,"Pais",entrada["country"])
-    mp.put(avistamiento,"Longitud",format(round(float(entrada["longitude"]),2),".2f"))
-    mp.put(avistamiento,"Latitud",format(round(float(entrada["latitude"]),2),".2f"))
+    mp.put(avistamiento,"Longitud",round(float(entrada["longitude"]),2))
+    mp.put(avistamiento,"Latitud",round(float(entrada["latitude"]),2))
 
     return avistamiento
 
@@ -180,35 +180,39 @@ def avistamientos_hora(catalog,hora_menor,hora_mayor):
 
     hora_menor = om.ceiling(arbol,hora_menor)
     hora_mayor = om.floor(arbol,hora_mayor)
-    rango_horas = om.values(arbol,hora_menor,hora_mayor)
     avistamientos = lt.newList("ARRAY_LIST")
+    if hora_mayor != None and hora_menor != None:
+        rango_horas = om.values(arbol,hora_menor,hora_mayor)
+        contador = 0
+        for hora in lt.iterator(rango_horas):
+            contador += 1
+            if contador < 4 or contador in range(lt.size(rango_horas)-2,lt.size(rango_horas)+1):
+                mergesort.sort(hora,sort_time)
 
-    contador = 0
-    for hora in lt.iterator(rango_horas):
-        contador += 1
-        if contador < 4 or contador in range(lt.size(rango_horas)-2,lt.size(rango_horas)+1):
-            mergesort.sort(hora,sort_time)
-
-        for avistamiento in lt.iterator(hora):
-            lt.addLast(avistamientos,avistamiento)
+            for avistamiento in lt.iterator(hora):
+                lt.addLast(avistamientos,avistamiento)
     
     return avistamientos,om.maxKey(arbol),numero_hora_max
 
 
 def avistamientos_area(catalog,lon_min,lon_max,lat_min,lat_max):
     arbol_Lon = mp.get(catalog,"Longitudes")["value"]
+    lista_retorno = lt.newList("ARRAY_LIST")
+    
     lon_min = om.ceiling(arbol_Lon,lon_min)
     lon_max = om.floor(arbol_Lon,lon_max)
 
-    lista_retorno = lt.newList("ARRAY_LIST")
-    rango_lon = om.values(arbol_Lon,lon_min,lon_max)
-    for arbol_Lat in lt.iterator(rango_lon):
-        lat_min = om.ceiling(arbol_Lat,lat_min)
-        lat_max = om.floor(arbol_Lat,lat_max)
-        rango_lat = om.values(arbol_Lat,lat_min,lat_max)
-        for latitud in lt.iterator(rango_lat):
-            for avistamiento in lt.iterator(latitud):
-                lt.addLast(lista_retorno,avistamiento)
+    if lon_min != None and lon_max != None:
+        rango_lon = om.values(arbol_Lon,lon_min,lon_max)
+
+        for arbol_Lat in lt.iterator(rango_lon):
+            lat_min_in = om.ceiling(arbol_Lat,lat_min)
+            lat_max_in = om.floor(arbol_Lat,lat_max)
+            if lat_min_in !=None and lat_max_in != None:
+                rango_lat = om.values(arbol_Lat,lat_min_in,lat_max_in)
+                for latitud in lt.iterator(rango_lat):
+                    for avistamiento in lt.iterator(latitud):
+                        lt.addLast(lista_retorno,avistamiento)
     
     return lista_retorno
         

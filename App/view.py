@@ -29,6 +29,7 @@ assert cf
 import time
 from prettytable import PrettyTable
 from DISClib.ADT import map as mp
+from prettytable.prettytable import ALL
 
 
 """
@@ -92,6 +93,20 @@ def print_avistamientos_hora(lista,llave_max,conteo_max):
         tabla.add_row([mp.get(avistamiento,"Dia")["value"],mp.get(avistamiento,"Ciudad")["value"],mp.get(avistamiento,"Pais")["value"],mp.get(avistamiento,"Duracion")["value"],mp.get(avistamiento,"Forma")["value"]])
     print(tabla)
     
+def print_avistamientos_area(lista):
+    print("El total de avistamientos en esa área es: " + str(lt.size(lista)))
+    tabla = PrettyTable(hrules = ALL)
+    tabla.field_names = ["Fecha y hora", "Ciudad", "Pais","Duración","Forma","Longitud","Latitud"]
+
+    for i in range(1,6):
+        avistamiento = lt.getElement(lista,i)
+        tabla.add_row([mp.get(avistamiento,"Dia")["value"],mp.get(avistamiento,"Ciudad")["value"],mp.get(avistamiento,"Pais")["value"],mp.get(avistamiento,"Duracion")["value"],mp.get(avistamiento,"Forma")["value"],mp.get(avistamiento,"Longitud")["value"],mp.get(avistamiento,"Latitud")["value"]])
+
+    for i in range(lt.size(lista)-4,lt.size(lista)+1):
+        avistamiento = lt.getElement(lista,i)
+        tabla.add_row([mp.get(avistamiento,"Dia")["value"],mp.get(avistamiento,"Ciudad")["value"],mp.get(avistamiento,"Pais")["value"],mp.get(avistamiento,"Duracion")["value"],mp.get(avistamiento,"Forma")["value"],mp.get(avistamiento,"Longitud")["value"],mp.get(avistamiento,"Latitud")["value"]])
+    print(tabla)
+
     
 
 def printMenu():
@@ -148,15 +163,17 @@ while True:
         print("Tiempo requerido "+str(elapsed_time_mseg)+" mseg")
     
     elif int(inputs[0]) == 5:
-        lon_min = format(round(float(input("Ingrese la longitud mínima: ")),2),".2f")
-        lon_max = format(round(float(input("Ingrese la longitud máxima: ")),2),".2f")
-        lat_min = format(round(float(input("Ingrese la latitud mínima: ")),2),"2f")
-        lat_max = format(round(float(input("Ingrese la latitud máxima: ")),2),"2f")
+        lon_min = round(float(input("Ingrese la longitud mínima: ")),2)
+        lon_max = round(float(input("Ingrese la longitud máxima: ")),2)
+        lat_min = round(float(input("Ingrese la latitud mínima: ")),2)
+        lat_max = round(float(input("Ingrese la latitud máxima: ")),2)
 
         start_time = time.process_time()
         resultado = controller.avistamientos_area(catalog,lon_min,lon_max,lat_min,lat_max)
         stop_time = time.process_time()
         elapsed_time_mseg = (stop_time - start_time)*1000
+        print_avistamientos_area(resultado)
+        print("Tiempo requerido "+str(elapsed_time_mseg)+" mseg")
 
 
     else:
