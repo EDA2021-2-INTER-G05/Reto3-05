@@ -148,9 +148,16 @@ while True:
         print("Tiempo requerido "+str(elapsed_time_mseg)+" mseg")
     
     elif int(inputs[0]) == 5:
-        pass
-        
-        
+        lon_min = format(round(float(input("Ingrese la longitud mínima: ")),2),".2f")
+        lon_max = format(round(float(input("Ingrese la longitud máxima: ")),2),".2f")
+        lat_min = format(round(float(input("Ingrese la latitud mínima: ")),2),"2f")
+        lat_max = format(round(float(input("Ingrese la latitud máxima: ")),2),"2f")
+
+        start_time = time.process_time()
+        resultado = controller.avistamientos_area(catalog,lon_min,lon_max,lat_min,lat_max)
+        stop_time = time.process_time()
+        elapsed_time_mseg = (stop_time - start_time)*1000
+
 
     else:
         sys.exit(0)

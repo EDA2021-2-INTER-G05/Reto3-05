@@ -25,6 +25,7 @@
  """
 
 
+from DISClib.DataStructures.bst import select
 import config as cf
 from DISClib.ADT import list as lt
 from DISClib.ADT import map as mp
@@ -138,8 +139,8 @@ def nuevoAvistamiento(entrada):
     else:
         mp.put(avistamiento,"Forma",entrada["shape"])
     mp.put(avistamiento,"Pais",entrada["country"])
-    mp.put(avistamiento,"Longitud",round(float(entrada["longitude"]),2))
-    mp.put(avistamiento,"Latitud",round(float(entrada["latitude"]),2))
+    mp.put(avistamiento,"Longitud",format(round(float(entrada["longitude"]),2),".2f"))
+    mp.put(avistamiento,"Latitud",format(round(float(entrada["latitude"]),2),".2f"))
 
     return avistamiento
 
@@ -193,6 +194,24 @@ def avistamientos_hora(catalog,hora_menor,hora_mayor):
     
     return avistamientos,om.maxKey(arbol),numero_hora_max
 
+
+def avistamientos_area(catalog,lon_min,lon_max,lat_min,lat_max):
+    arbol_Lon = mp.get(catalog,"Longitudes")["value"]
+    lon_min = om.ceiling(arbol_Lon,lon_min)
+    lon_max = om.floor(arbol_Lon,lon_max)
+
+    lista_retorno = lt.newList("ARRAY_LIST")
+    rango_lon = om.values(arbol_Lon,lon_min,lon_max)
+    for arbol_Lat in lt.iterator(rango_lon):
+        lat_min = om.ceiling(arbol_Lat,lat_min)
+        lat_max = om.floor(arbol_Lat,lat_max)
+        rango_lat = om.values(arbol_Lat,lat_min,lat_max)
+        for latitud in lt.iterator(rango_lat):
+            for avistamiento in lt.iterator(latitud):
+                lt.addLast(lista_retorno,avistamiento)
+    
+    return lista_retorno
+        
 
 # Funciones utilizadas para comparar elementos dentro de una lista
 

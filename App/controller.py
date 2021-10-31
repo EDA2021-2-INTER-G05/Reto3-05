@@ -64,3 +64,6 @@ def avistamientos_ciudad(catalog,ciudad):
 
 def avistamientos_hora(catalog,hora_menor,hora_mayor):
     return model.avistamientos_hora(catalog,hora_menor,hora_mayor)
+
+def avistamientos_area(catalog,lon_min,lon_max,lat_min,lat_max):
+    return model.avistamientos_area(catalog,lon_min,lon_max,lat_min,lat_max)
