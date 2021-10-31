@@ -146,7 +146,7 @@ def avistamientos_ciudad(catalog,ciudad):
 def avistamientos_hora(catalog,hora_menor,hora_mayor):
     arbol = mp.get(catalog,"Horas")["value"]
     llave_max_glo = om.maxKey(arbol)
-    numero_hora_max = lt.size(om.get(arbol,llave_max_glo))
+    numero_hora_max = lt.size(om.get(arbol,llave_max_glo)["value"])
 
     hora_menor = om.ceiling(arbol,hora_menor)
     hora_mayor = om.floor(arbol,hora_mayor)
