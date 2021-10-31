@@ -31,6 +31,8 @@ from DISClib.ADT import map as mp
 from DISClib.ADT import orderedmap as om
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import shellsort 
+from DISClib.Algorithms.Sorting import mergesort
+from DISClib.Algorithms.Sorting import insertionsort 
 assert cf
 from datetime import datetime 
 from DISClib.Algorithms.Trees import traversal as tra
@@ -47,6 +49,7 @@ def initCatalog():
     catalog = mp.newMap(loadfactor=4)
     mp.put(catalog,"Ciudades",mp.newMap(loadfactor=4))
     mp.put(catalog,"Horas",om.newMap())
+    mp.put(catalog,"Longitudes",om.newMap())
     return catalog
 
 
@@ -74,6 +77,9 @@ def añadirAvistamiento(avistamiento,catalog):
     llave = (fecha.hour,fecha.minute)
     add_list_in_om(mp.get(catalog,"Horas")["value"],llave,avistamiento)
 
+    #Carga req 5
+    add_or_create_om_in_om(mp.get(catalog,"Longitudes")["value"],mp.get(avistamiento,"Longitud")["value"],mp.get(avistamiento,"Latitud")["value"],avistamiento)
+
 def add_or_create_in_om(mapa,llave_mapa,llave_arbol,valor):
     if mp.contains(mapa,llave_mapa):
         arbol = mp.get(mapa,llave_mapa)["value"]
@@ -99,6 +105,27 @@ def add_list_in_om(arbol,llave_arbol,valor):
         om.put(arbol,llave_arbol,lt.newList())
         lista = om.get(arbol,llave_arbol)["value"]
         lt.addLast(lista,valor)
+
+def add_or_create_om_in_om(arbol,llave_arbol1,llave_arbol2,valor):
+    if om.contains(arbol,llave_arbol1):
+        arbol2 = om.get(arbol,llave_arbol1)["value"]
+        if om.contains(arbol2,llave_arbol2):
+            lista = om.get(arbol2,llave_arbol2)["value"]
+            lt.addLast(lista,valor)
+        else:
+            om.put(arbol2,llave_arbol2,lt.newList("ARRAY_LIST"))
+            lista = om.get(arbol2,llave_arbol2)["value"]
+            lt.addLast(lista,valor)
+    
+    else:
+        om.put(arbol,llave_arbol1,om.newMap())
+        arbol2=om.get(arbol,llave_arbol1)["value"]
+        om.put(arbol2,llave_arbol2,lt.newList("ARRAY_LIST"))
+        lista = om.get(arbol2,llave_arbol2)["value"]
+        lt.addLast(lista,valor)
+        
+
+
 # Funciones para creacion de datos
 
 def nuevoAvistamiento(entrada):
@@ -111,6 +138,9 @@ def nuevoAvistamiento(entrada):
     else:
         mp.put(avistamiento,"Forma",entrada["shape"])
     mp.put(avistamiento,"Pais",entrada["country"])
+    mp.put(avistamiento,"Longitud",round(float(entrada["longitude"]),2))
+    mp.put(avistamiento,"Latitud",round(float(entrada["latitude"]),2))
+
     return avistamiento
 
 
@@ -156,7 +186,7 @@ def avistamientos_hora(catalog,hora_menor,hora_mayor):
     for hora in lt.iterator(rango_horas):
         contador += 1
         if contador < 4 or contador in range(lt.size(rango_horas)-2,lt.size(rango_horas)+1):
-            shellsort.sort(hora,sort_time)
+            mergesort.sort(hora,sort_time)
 
         for avistamiento in lt.iterator(hora):
             lt.addLast(avistamientos,avistamiento)

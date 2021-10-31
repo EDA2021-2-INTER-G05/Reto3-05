@@ -146,6 +146,9 @@ while True:
         elapsed_time_mseg = (stop_time - start_time)*1000
         print_avistamientos_hora(resultado[0],resultado[1],resultado[2])
         print("Tiempo requerido "+str(elapsed_time_mseg)+" mseg")
+    
+    elif int(inputs[0]) == 5:
+        pass
         
         
 
