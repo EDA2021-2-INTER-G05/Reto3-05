@@ -71,12 +71,11 @@ def print_datos(numero,primeros,ultimos):
         tabla.add_row([mp.get(avistamiento,"Dia")["value"],mp.get(avistamiento,"Ciudad")["value"],mp.get(avistamiento,"Pais")["value"],mp.get(avistamiento,"Duracion")["value"],mp.get(avistamiento,"Forma")["value"]])
     print(tabla)
 
-def print_avistamientos_hora(lista,tardios):
-    print("Los avistamientos más tarde globalmente son: ")
+def print_avistamientos_hora(lista,llave_max,conteo_max):
+    print("El número de avistamientos a la hora más tarde fue: ")
     tabla = PrettyTable()
-    tabla.field_names = ["Fecha y hora", "Ciudad", "Pais","Duración","Forma"]
-    for avistamiento in lt.iterator(tardios):
-        tabla.add_row([mp.get(avistamiento,"Dia")["value"],mp.get(avistamiento,"Ciudad")["value"],mp.get(avistamiento,"Pais")["value"],mp.get(avistamiento,"Duracion")["value"],mp.get(avistamiento,"Forma")["value"]])
+    tabla.field_names = ["Hora", "Conteo"]
+    tabla.add_row([llave_max,conteo_max])
     print(tabla)
 
     print("Hay un total de "+str(lt.size(lista))+" avistamientos en el rango de horas.")
@@ -145,7 +144,7 @@ while True:
         resultado = controller.avistamientos_hora(catalog,hora_menor,hora_mayor)
         stop_time = time.process_time()
         elapsed_time_mseg = (stop_time - start_time)*1000
-        print_avistamientos_hora(resultado[0],resultado[1])
+        print_avistamientos_hora(resultado[0],resultado[1],resultado[2])
         print("Tiempo requerido "+str(elapsed_time_mseg)+" mseg")
         
         
