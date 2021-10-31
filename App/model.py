@@ -145,16 +145,8 @@ def avistamientos_ciudad(catalog,ciudad):
 
 def avistamientos_hora(catalog,hora_menor,hora_mayor):
     arbol = mp.get(catalog,"Horas")["value"]
-    llave_max_glo = om.size(arbol)
-    llave_min_glo = om.select(arbol,llave_max_glo-5)
-    horas_mas_tardias = om.values(arbol,llave_min_glo,om.maxKey(arbol))
-    mas_tardios = lt.newList("ARRAY_LIST")
-    for hora in lt.iterator(horas_mas_tardias):
-        shellsort.sort(hora,sort_time)
-        for avistamiento in lt.iterator(hora):
-            lt.addLast(mas_tardios,avistamiento)
-    
-    mas_tardios = lt.subList(mas_tardios,lt.size(mas_tardios)-5,5)
+    llave_max_glo = om.maxKey(arbol)
+    numero_hora_max = lt.size(om.get(arbol,llave_max_glo))
 
     hora_menor = om.ceiling(arbol,hora_menor)
     hora_mayor = om.floor(arbol,hora_mayor)
@@ -170,7 +162,7 @@ def avistamientos_hora(catalog,hora_menor,hora_mayor):
         for avistamiento in lt.iterator(hora):
             lt.addLast(avistamientos,avistamiento)
     
-    return avistamientos,mas_tardios
+    return avistamientos,llave_max_glo,numero_hora_max
 
 
 # Funciones utilizadas para comparar elementos dentro de una lista
