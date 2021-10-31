@@ -75,7 +75,7 @@ def print_avistamientos_hora(lista,llave_max,conteo_max):
     print("El número de avistamientos a la hora más tarde fue: ")
     tabla = PrettyTable()
     tabla.field_names = ["Hora", "Conteo"]
-    tabla.add_row([llave_max,conteo_max])
+    tabla.add_row([str(llave_max[0])+":"+str(llave_max[1]),conteo_max])
     print(tabla)
 
     print("Hay un total de "+str(lt.size(lista))+" avistamientos en el rango de horas.")
