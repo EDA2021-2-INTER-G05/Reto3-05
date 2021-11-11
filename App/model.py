@@ -35,9 +35,11 @@ from DISClib.Algorithms.Sorting import shellsort
 from DISClib.Algorithms.Sorting import mergesort
 from DISClib.Algorithms.Sorting import insertionsort 
 assert cf
-from datetime import datetime 
+import datetime
 from DISClib.Algorithms.Trees import traversal as tra
 from DISClib.ADT import queue as que
+
+
 
 """
 Se define la estructura de un catálogo de videos. El catálogo tendrá dos listas, una para los videos, otra para las categorias de
@@ -50,8 +52,11 @@ def initCatalog():
     catalog = mp.newMap(loadfactor=4)
     mp.put(catalog,"Ciudades",mp.newMap(loadfactor=4))
     mp.put(catalog,"Horas",om.newMap())
+    mp.put(catalog,"Duraciones",om.newMap())
     mp.put(catalog,"Longitudes",om.newMap())
     return catalog
+
+
 
 
 # Funciones para agregar informacion al catalogo
@@ -73,6 +78,10 @@ def añadirAvistamiento(avistamiento,catalog):
     #Carga req 1
     add_or_create_in_om(mp.get(catalog,"Ciudades")["value"],mp.get(avistamiento,"Ciudad")["value"],mp.get(avistamiento,"Dia")["value"],avistamiento)
 
+    #Carga req 2
+
+    add_list_in_om(mp.get(catalog,"Duraciones")["value"],mp.get(avistamiento,"Duracion")["value"],avistamiento)
+
     #Carga req 3
     fecha = mp.get(avistamiento,"Dia")["value"]
     llave = (fecha.hour,fecha.minute)
@@ -81,6 +90,58 @@ def añadirAvistamiento(avistamiento,catalog):
     #Carga req 5
     add_or_create_om_in_om(mp.get(catalog,"Longitudes")["value"],mp.get(avistamiento,"Longitud")["value"],mp.get(avistamiento,"Latitud")["value"],avistamiento)
 
+def newCatalog():
+    catalog2 = {'maps': None,
+               'ciudad' : None
+    }
+    catalog2['arbol'] = om.newMap(omaptype="RBT", comparefunction=Datos)
+    catalog2['duraciones'] = om.newMap(omaptype="RBT", comparefunction=Datos) 
+    catalog2['Fecha'] = om.newMap(omaptype="RBT", comparefunction=Datos) 
+    return catalog2
+
+
+def addavistamiento(catalog2,avistamiento):
+
+    fecha = datetime.datetime.strptime(avistamiento["datetime"], "%Y-%m-%d %H:%M:%S")
+    avistamiento['duration (seconds)'] = float(avistamiento['duration (seconds)']) 
+    om.put(catalog2['arbol'], fecha, avistamiento)
+    
+    esta = om.contains(catalog2['duraciones'], avistamiento['duration (seconds)'])
+    if not esta:
+        orden = om.newMap(omaptype="BST", comparefunction=comparearbol)
+        key = avistamiento['city'] + avistamiento['country']
+        om.put(orden, key, avistamiento)
+        om.put(catalog2['duraciones'], avistamiento['duration (seconds)'], orden)
+
+    else:
+        orden = om.get(catalog2['duraciones'], avistamiento['duration (seconds)'])['value']
+        key = avistamiento['city'] + avistamiento['country']
+        esta = om.contains(orden,key)
+        if not esta:
+            om.put(orden,key,avistamiento)
+            om.put(catalog2['duraciones'], avistamiento['duration (seconds)'], orden)
+        else:
+            while esta:
+                key = key + "a"
+                esta = om.contains(orden,key)
+                if esta: 
+                    pass
+                else:
+                    om.put(orden,key,avistamiento)
+                    om.put(catalog2['duraciones'], avistamiento['duration (seconds)'], orden)
+    año = int(avistamiento["datetime"][0:4])    
+    mes = int(avistamiento["datetime"][5:7])    
+    dia = int(avistamiento["datetime"][8:10])
+    fecha = datetime.date(año,mes,dia)
+    esta2 = om.contains(catalog2["Fecha"],fecha)
+    if not esta2:
+        orden2 = om.newMap(omaptype="RBT", comparefunction=Datos)      
+        om.put(orden2,fecha,avistamiento)
+        om.put(catalog2["Fecha"], fecha, orden2)
+    else:
+        orden2 = om.get(catalog2["Fecha"], fecha)["value"]
+        om.put(orden2,fecha,avistamiento)
+        om.put(catalog2["Fecha"], fecha, orden2) 
 def add_or_create_in_om(mapa,llave_mapa,llave_arbol,valor):
     if mp.contains(mapa,llave_mapa):
         arbol = mp.get(mapa,llave_mapa)["value"]
@@ -132,7 +193,7 @@ def add_or_create_om_in_om(arbol,llave_arbol1,llave_arbol2,valor):
 def nuevoAvistamiento(entrada):
     avistamiento = mp.newMap(loadfactor=4)
     mp.put(avistamiento,"Ciudad",entrada["city"])
-    mp.put(avistamiento,"Dia",datetime.strptime(entrada["datetime"],"%Y-%m-%d %X"))
+    mp.put(avistamiento,"Dia",datetime.datetime.strptime(entrada["datetime"],"%Y-%m-%d %X"))
     mp.put(avistamiento,"Duracion",entrada["duration (seconds)"])
     if entrada["shape"] == "":
         mp.put(avistamiento,"Forma","*No especificado*")
@@ -174,10 +235,49 @@ def avistamientos_ciudad(catalog,ciudad):
 
     return lista, numero_ciudades
 
+#req 2
+def avistamientos_duracion(catalog2, duracion1, duracion2):
+    min = float(duracion1)
+    max = float(duracion2)
+    duracion = catalog2['duraciones']
+    size = om.size(duracion)
+    ffinal = lt.newList()
+    kmax = om.maxKey(duracion)
+    maxi = om.get(duracion,kmax)["value"]
+    sizemayor = om.size(maxi)
+    dicct = {}
+    dicct["llave"] = kmax
+    dicct["valor"] = sizemayor
+    lt.addLast(ffinal,dicct)
+    datos = om.values(duracion,min,max)
+    size2 = 0
+    for x in lt.iterator(datos):
+        size3 = om.size(x)
+        size2 += size3
+    keys = om.keys(duracion,min,max)
+    minimax = lt.firstElement(keys)
+    maximax = lt.lastElement(keys)
+    aminima = om.get(duracion,minimax)["value"].copy()
+    amaxima = om.get(duracion,maximax)["value"].copy()
+    llfinal = lt.newList(datastructure="ARRAY_LIST")
+    llmax= lt.newList()
+    for x in range(3):
+        kmin = om.minKey(aminima)
+        minima = om.get(aminima,kmin)["value"]
+        lt.addLast(llfinal,minima)
+        om.deleteMin(aminima)
+        kmax = om.maxKey(amaxima)
+        maxima = om.get(amaxima,kmax)['value']
+        lt.addFirst(llmax,maxima)
+        om.deleteMax(amaxima)
+    for i in lt.iterator(llmax):
+        lt.addLast(llfinal,i)
+
+    return (size,ffinal, size2,llfinal)
+#fin req 2
 def avistamientos_hora(catalog,hora_menor,hora_mayor):
     arbol = mp.get(catalog,"Horas")["value"]
     numero_hora_max = lt.size(om.get(arbol,om.maxKey(arbol))["value"])
-
     hora_menor = om.ceiling(arbol,hora_menor)
     hora_mayor = om.floor(arbol,hora_mayor)
     avistamientos = lt.newList("ARRAY_LIST")
@@ -194,6 +294,53 @@ def avistamientos_hora(catalog,hora_menor,hora_mayor):
     
     return avistamientos,om.maxKey(arbol),numero_hora_max
 
+
+#req 4
+def contar_rango_fecha(catalog2, inferior, superior):
+    añoinferior = int(inferior[0:4])
+    mesinferior = int(inferior[5:7])
+    diainferior = int(inferior[8:10])
+
+    añosuperior = int(superior[0:4])
+    mesuperior = int(superior[5:7])
+    diasuperior = int(superior[8:10])
+
+    dateinicio = datetime.date(añoinferior,mesinferior,diainferior)
+    datefinal = datetime.date(añosuperior,mesuperior,diasuperior)
+    
+    
+    obtener = om.keys(catalog2["Fecha"],dateinicio,datefinal)
+    
+    x = 0
+    for z in lt.iterator(obtener):             
+        a = om.get(catalog2["Fecha"],z)["value"]       
+        x += om.size(a)
+
+    
+    ff1 = lt.newList(datastructure="ARRAY_LIST")
+
+    for a in lt.iterator(obtener):
+        puede = lt.size(ff1)
+        if puede < 3:
+            f = om.get(catalog2["Fecha"],a)["value"]["root"]["value"]
+            lt.addLast(ff1,f)
+        else:
+            break
+    
+    ff2 = lt.newList(datastructure="ARRAY_LIST")
+    ffinal = lt.size(obtener)
+
+    for b in range(ffinal,0,-1):
+        
+        puede = lt.size(ff2)
+        if puede < 3:
+            j = lt.getElement(obtener,b)          
+            h = om.get(catalog2["Fecha"],j)["value"]["root"]["value"]
+            lt.addFirst(ff2,h)
+        else:
+            break
+    return ff1,ff2,x
+#fin req 4
 
 def avistamientos_area(catalog,lon_min,lon_max,lat_min,lat_max):
     arbol_Lon = mp.get(catalog,"Longitudes")["value"]
@@ -224,5 +371,23 @@ def sort_time(av1,av2):
         return True
     else:
         return False
+
+def Datos(Datos1, Datos2):
+   
+    if (Datos1 == Datos2):
+        return 0
+    elif (Datos1>Datos2):
+        return 1
+    else:
+        return -1
+
+def comparearbol(date1,date2):
+    x = min(date1,date2)
+    if (date1 == date2):
+        return 0
+    elif x == date1:
+        return -1
+    elif x == date2:
+        return 1
 
 # Funciones de ordenamiento

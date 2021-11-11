@@ -43,7 +43,7 @@ def loadData(catalog):
     return numero
 
 def Cargaravisamientos(catalog):
-    file = cf.data_dir + "UFOS-utf8-large.csv"
+    file = cf.data_dir + "UFOS-utf8-small.csv"
     input_file = csv.DictReader(open(file, encoding='utf-8'))
     numero = 0
     primeros_5 = lt.newList()
@@ -53,7 +53,20 @@ def Cargaravisamientos(catalog):
         model.subirAvistamiento(catalog,avistamiento,numero,primeros_5,ultimos_5)
     
     return numero, primeros_5,ultimos_5
- 
+
+def init2():
+    catalog = model.newCatalog()
+    return catalog
+
+
+
+def loadData2(catalog2):
+    archivo = cf.data_dir + "UFOS-utf8-small.csv"
+    input_file = csv.DictReader(open(archivo, encoding="utf-8"),
+    delimiter = ",")
+    for ufo in input_file:
+        model.addavistamiento(catalog2,ufo)
+    return catalog2
 
 # Funciones de ordenamiento
 
@@ -62,8 +75,14 @@ def Cargaravisamientos(catalog):
 def avistamientos_ciudad(catalog,ciudad):
     return model.avistamientos_ciudad(catalog,ciudad)
 
+def avistamientos_duracion(catalog2,duracion1,duracion2):
+    return model.avistamientos_duracion(catalog2,duracion1,duracion2)
+
 def avistamientos_hora(catalog,hora_menor,hora_mayor):
     return model.avistamientos_hora(catalog,hora_menor,hora_mayor)
 
+def contar_rango_fecha(catalog2, inferior, superior):
+    return model.contar_rango_fecha(catalog2, inferior, superior)
+    
 def avistamientos_area(catalog,lon_min,lon_max,lat_min,lat_max):
     return model.avistamientos_area(catalog,lon_min,lon_max,lat_min,lat_max)

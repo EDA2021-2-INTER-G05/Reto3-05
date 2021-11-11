@@ -27,6 +27,7 @@ import controller
 from DISClib.ADT import list as lt
 assert cf
 import time
+from DISClib.ADT import orderedmap as mo
 from prettytable import PrettyTable
 from DISClib.ADT import map as mp
 from prettytable.prettytable import ALL
@@ -121,6 +122,7 @@ def printMenu():
 
 
 catalog = None
+catalog2 = None
 
 """
 Menu principal
@@ -132,7 +134,9 @@ while True:
         print("Cargando información de los archivos ....")
         start_time = time.process_time()
         catalog = initCatalog()
+        catalog2 = controller.init2()
         datos = loadData(catalog)
+        controller.loadData2(catalog2)
         stop_time = time.process_time()
         elapsed_time_mseg = (stop_time - start_time)*1000
         print("Se han cargado los datos exitosamente.")
@@ -146,6 +150,32 @@ while True:
         stop_time = time.process_time()
         elapsed_time_mseg = (stop_time - start_time)*1000
         print_avistamientos_ciudad(resultado[0],resultado[1],elapsed_time_mseg)
+
+    elif int(inputs[0]) == 2:
+        duracion1 = input("ingrese duracion minima: ")
+        duracion2 = input("ingrese duracion maxima: ")
+        start_time = time.process_time()
+        datos = controller.avistamientos_duracion(catalog2,duracion1,duracion2)
+        stop_time = time.process_time()
+        timed = (stop_time - start_time)*1000
+        print('se encuentra un total de ' + str(datos[0]) + ' segun los datos dados...')
+        print('el avistamiento de ovnix mas largos es: ')
+        print("-" * 50)
+        print('|' + 'duracion'.center(40) + ' | ' + 'count'.center(10) + '|')
+        print("=" * 50)
+        for x in lt.iterator(datos[1]):
+            print('|' + str(int(x["llave"])).center(40) + ' | ' + str(int(x["valor"])).center(10) + '|')
+            print("-" * 50)
+        print('hay ' + str(datos[2]) + ' avistamientos entre: ' + duracion1 + ' y ' + duracion2 )
+        print('los primero 3 y ultimos 3 avistamientos son:')
+        print("+"+("-"*143)+"+")
+        print("|"+ "datetime".center(19)+" | "+ "city".center(30)+" | "+ "state".center(15)+" | "+"country".center(15)+"|"+"shape".center(20)+" | "+ str("duration (seconds)").center(30)+" | ")
+        print("+"+("-"*143)+"+")
+        for x in lt.iterator(datos[3]):
+            print("|"+ str(x["datetime"]).center(19)+" | "+ x["city"].center(30)+" | "+ x["state"].center(15)+" | "+x["country"].center(15)+"|"+x["shape"].center(20)+" | "+ str(x["duration (seconds)"]).center(30)+" | ")
+            print("+"+("-"*143)+"+")
+        print("El tiempo para cargar los archivos fue de:", str(timed) , "s") 
+   
     
     elif int(inputs[0]) == 3:
         hora_menor = input("Ingrese la hora del límite inferior (HH:MM): ")+":00"
@@ -161,6 +191,31 @@ while True:
         elapsed_time_mseg = (stop_time - start_time)*1000
         print_avistamientos_hora(resultado[0],resultado[1],resultado[2])
         print("Tiempo requerido "+str(elapsed_time_mseg)+" mseg")
+
+    elif int(inputs[0]) == 4:
+        inferior= input('Ingrese el limite inferior en formato AA-MM-DD: ')
+        superior = input('Ingrese el limite superior en formato AA-MM-DD: ') 
+        start_time = time.process_time()
+        datos = controller.contar_rango_fecha(catalog2, inferior, superior)
+        stop_time = time.process_time()
+        timed = (stop_time - start_time)*1000
+        ffinal=mo.size(catalog2["Fecha"])
+        
+       
+        print("hay en total: : "+ str(ffinal)+" dias con avistamiento de ovnis: ")
+        print('hay ' + str(datos[2]) + ' avistamientos entre: ' + inferior + ' y ' + superior )
+        print('los primero 3 y ultimos 3 avistamientos son:')
+        print("+"+("-"*140)+"+")
+        print("|"+ "datetime".center(25)+" | "+ "city".center(35)+" | "+ "country".center(15)+" | "+"shape".center(30)+" | "+ str("duration (seconds)").center(40)+" | ")
+        print("+"+("-"*140)+"+")
+        for x in lt.iterator(datos[0]):                             
+            print("|"+str(x["datetime"])+" | "+ x["city"].center(40)+" | "+ x["country"].center(25)+" | "+x["shape"].center(30)+" | "+ str(x["duration (seconds)"]).center(40)+" | ")
+            print("+"+("-"*127)+"+")
+        
+        for x in lt.iterator(datos[1]):                             
+            print("|"+ str(x["datetime"])+" | "+ x["city"].center(40)+" | "+ x["country"].center(25)+" | "+x["shape"].center(30)+" | "+ str(x["duration (seconds)"]).center(40)+" | ")
+            print("+"+("-"*127)+"+") 
+        print("El tiempo para cargar los archivos fue de:", str(timed) , "s") 
     
     elif int(inputs[0]) == 5:
         lon_min = round(float(input("Ingrese la longitud mínima: ")),2)
